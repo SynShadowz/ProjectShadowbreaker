@@ -34,6 +34,12 @@ protected:
 	/** Resets HMD orientation in VR. */
 	void OnResetVR();
 
+	/** Allows the Character to begin sprinting */
+	void Sprint();
+
+	/** Allows the character to stop sprinting */
+	void StopSprinting();
+
 	/** Called for forwards/backward input */
 	void MoveForward(float Value);
 

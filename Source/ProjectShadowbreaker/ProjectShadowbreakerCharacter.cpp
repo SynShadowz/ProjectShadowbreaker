@@ -57,6 +57,9 @@ void AProjectShadowbreakerCharacter::SetupPlayerInputComponent(class UInputCompo
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AProjectShadowbreakerCharacter::Sprint);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AProjectShadowbreakerCharacter::StopSprinting);
+
 	PlayerInputComponent->BindAxis("MoveForward", this, &AProjectShadowbreakerCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AProjectShadowbreakerCharacter::MoveRight);
 
@@ -137,4 +140,16 @@ void AProjectShadowbreakerCharacter::MoveRight(float Value)
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
 	}
+}
+
+void AProjectShadowbreakerCharacter::Sprint()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Sprinting!"));
+	GetCharacterMovement()->MaxWalkSpeed = 1500.f;
+}
+
+void AProjectShadowbreakerCharacter::StopSprinting()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Stopped Sprinting!"));
+	GetCharacterMovement()->MaxWalkSpeed = 600.f;
 }
