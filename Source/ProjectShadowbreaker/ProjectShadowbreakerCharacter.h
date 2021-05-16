@@ -40,6 +40,38 @@ protected:
 	/** Allows the character to stop sprinting */
 	void StopSprinting();
 
+	/** Zoom the camera in (Aim-Down-Sights) */
+	void ZoomIn();
+
+	/** Zoom the camera out (Blind-fire) */
+	void ZoomOut();
+
+	/** Allows the character to equip an item they are close to */
+	void EquipItem();
+
+	// Heal Functions //
+	// Test Healing
+	void StartHealing();
+	
+	// Heal Character
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	void Heal(float _healAmount);
+
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	void HealArmor(float _healAmount);
+
+	// End Heal Functions //
+
+	// Damage Functions //
+	// Test Damage
+	void StartDamage();
+	
+	// Damage Character
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	void TakeDamage(float _damageAmount);
+
+	// End Damage Functions //
+
 	/** Called for forwards/backward input */
 	void MoveForward(float Value);
 
@@ -63,6 +95,48 @@ protected:
 
 	/** Handler for when a touch input stops. */
 	void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
+
+	/** Determines if the character is overlapping an equippable item */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Items")
+	bool bIsOverlappingItem;
+
+	/** Determines when the character is sprinting */
+	bool bIsSprinting;
+
+	/** Determines if the character has armor */
+	bool bHasArmor;
+
+	/** Determines if the character is currently zoomed-in with their weapon */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	bool bIsZoomedIn;
+
+	/** The character's current level */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
+	int currentLevel;
+
+	/** The amount of available upgrade points the character currently has */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
+	int upgradePoints;
+
+	/** The amount of strength the character currently has */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
+	int strengthValue;
+
+	/** The amount of dexterity the character currently has */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
+	int dexterityValue;
+
+	/** The amount of intellect the character currently has */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
+	int intellectValue;
+
+	/** The amount of health the character currently has */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
+	float playerHealth;
+
+	/** The amount of armor the character currently has */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
+	float playerArmor;
 
 protected:
 	// APawn interface

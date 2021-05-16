@@ -45,6 +45,22 @@ AProjectShadowbreakerCharacter::AProjectShadowbreakerCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+
+	/// <Player Variables> ///
+	bIsOverlappingItem = false;
+	bIsSprinting = false;
+	bHasArmor = true;
+	bIsZoomedIn = false;
+
+	currentLevel = 1;
+	upgradePoints = 5;
+
+	strengthValue = 1;
+	dexterityValue = 1;
+	intellectValue = 1;
+	
+	playerHealth = 1.f;
+	playerArmor = 1.f;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -59,6 +75,14 @@ void AProjectShadowbreakerCharacter::SetupPlayerInputComponent(class UInputCompo
 
 	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AProjectShadowbreakerCharacter::Sprint);
 	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AProjectShadowbreakerCharacter::StopSprinting);
+
+	PlayerInputComponent->BindAction("Heal", IE_Pressed, this, &AProjectShadowbreakerCharacter::StartHealing);
+	PlayerInputComponent->BindAction("Damage", IE_Pressed, this, &AProjectShadowbreakerCharacter::StartDamage);
+
+	PlayerInputComponent->BindAction("EquipItem", IE_Pressed, this, &AProjectShadowbreakerCharacter::EquipItem);
+
+	PlayerInputComponent->BindAction("Zoom", IE_Pressed, this, &AProjectShadowbreakerCharacter::ZoomIn);
+	PlayerInputComponent->BindAction("Zoom", IE_Released, this, &AProjectShadowbreakerCharacter::ZoomOut);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AProjectShadowbreakerCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AProjectShadowbreakerCharacter::MoveRight);
@@ -145,11 +169,109 @@ void AProjectShadowbreakerCharacter::MoveRight(float Value)
 void AProjectShadowbreakerCharacter::Sprint()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Sprinting!"));
+	bIsSprinting = true;
 	GetCharacterMovement()->MaxWalkSpeed = 1500.f;
 }
 
 void AProjectShadowbreakerCharacter::StopSprinting()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Stopped Sprinting!"));
+	bIsSprinting = false;
 	GetCharacterMovement()->MaxWalkSpeed = 600.f;
+}
+
+void AProjectShadowbreakerCharacter::StartHealing()
+{
+	Heal(0.02f);
+}
+
+void AProjectShadowbreakerCharacter::Heal(float _healAmount)
+{
+	UE_LOG(LogTemp, Warning, TEXT("We are healing for %f points"), _healAmount);
+	playerHealth += _healAmount;
+	
+	if (playerHealth >= 1.f)
+	{
+		playerHealth = 1.f;
+	}
+}
+
+void AProjectShadowbreakerCharacter::HealArmor(float _healAmount)
+{
+	UE_LOG(LogTemp, Warning, TEXT("We are healing armor for %f points"), _healAmount);
+	playerArmor += _healAmount;
+	bHasArmor = true;
+
+	if (playerArmor >= 1.f)
+	{
+		playerArmor = 1.f;
+	}
+}
+
+
+void AProjectShadowbreakerCharacter::StartDamage()
+{
+	TakeDamage(0.02f);
+}
+
+void AProjectShadowbreakerCharacter::TakeDamage(float _damageAmount)
+{
+	UE_LOG(LogTemp, Warning, TEXT("We are taking damage for %f points"), _damageAmount);
+
+	if (bHasArmor)
+	{
+		playerArmor -= _damageAmount;
+		if (playerArmor < 0)
+		{
+			bHasArmor = false;
+			playerHealth += playerArmor;
+			playerArmor = 0.f;
+		}
+	}
+	else
+	{
+		playerHealth -= _damageAmount;
+
+		if (playerHealth <= 0.f)
+		{
+			playerHealth = 0.f;
+		}
+	}
+}
+
+void AProjectShadowbreakerCharacter::EquipItem()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Picked up an item"));
+}
+
+void AProjectShadowbreakerCharacter::ZoomIn()
+{
+	if (auto ThirdPersonCamera = GetCameraBoom())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("We are now zooming in."));
+		ThirdPersonCamera->TargetArmLength = 150.f;
+		ThirdPersonCamera->TargetOffset = FVector(0.f, 80.f, 70.f);
+		if (auto PlayerMovement = GetCharacterMovement())
+		{
+			PlayerMovement->MaxWalkSpeed = 300.f;
+		}
+
+		bIsZoomedIn = true;
+	}
+}
+
+void AProjectShadowbreakerCharacter::ZoomOut()
+{
+	if (auto ThirdPersonCamera = GetCameraBoom())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("We have stopped zooming in."));
+		ThirdPersonCamera->TargetArmLength = 300.f;
+		ThirdPersonCamera->TargetOffset = FVector(0.f, 0.f, 0.f);
+		if (auto PlayerMovement = GetCharacterMovement())
+		{
+			PlayerMovement->MaxWalkSpeed = 600.f;
+		}
+
+		bIsZoomedIn = false;
+	}
 }
